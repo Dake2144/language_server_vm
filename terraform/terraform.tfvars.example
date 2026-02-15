@@ -1,0 +1,35 @@
+# =============================================================================
+# Terraform Variables - EXAMPLE FILE
+# Copy this to terraform.tfvars and fill in your values
+# =============================================================================
+
+# Required: Your GCP Project ID
+project_id = "your-gcp-project-id"
+
+# Region and Zone (required - user must provide)
+region = "<your-region-here>"  # e.g., us-central1, europe-west1
+zone   = "<your-zone-here>"    # e.g., us-central1-a, europe-west1-b
+
+# Instance Configuration
+instance_name   = "talant-center-prod-vm"
+machine_type    = "e2-medium"
+boot_disk_size  = 30
+boot_disk_type  = "pd-balanced"
+boot_disk_image = "debian-cloud/debian-12"
+
+# Network Configuration
+network    = "default"
+subnetwork = null
+
+# Static IP (set to true for production)
+use_static_ip = false
+
+# Service Account (optional - uses default if null)
+service_account_email = null
+
+# SSH Access - IMPORTANT: Restrict this in production!
+# Example: ["YOUR_IP/32", "OFFICE_IP/32"]
+ssh_allowed_ips = ["0.0.0.0/0"]
+
+# Application Ports to open
+app_ports = ["8080", "3000"]

@@ -1,0 +1,93 @@
+# =============================================================================
+# Docker Compose - Application Stack Template
+# =============================================================================
+# Usage:
+#   docker compose up -d        # Start all services
+#   docker compose down         # Stop all services
+#   docker compose logs -f      # View logs
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Example: Web Application
+  # ---------------------------------------------------------------------------
+  app:
+    image: nginx:alpine  # Replace with your application image
+    container_name: talant-app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - app_data:/var/www/html
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "com.talant.service=app"
+      - "com.talant.env=production"
+
+  # ---------------------------------------------------------------------------
+  # Example: Database (PostgreSQL)
+  # ---------------------------------------------------------------------------
+  # db:
+  #   image: postgres:15-alpine
+  #   container_name: talant-db
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: ${DB_USER:-app}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD:?Database password required}
+  #     POSTGRES_DB: ${DB_NAME:-talant}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./init-db:/docker-entrypoint-initdb.d:ro
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-app}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Example: Redis Cache
+  # ---------------------------------------------------------------------------
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: talant-redis
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  app-network:
+    driver: bridge
+    name: talant-network
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  app_data:
+    name: talant-app-data
+  # postgres_data:
+  #   name: talant-postgres-data
+  # redis_data:
+  #   name: talant-redis-data
